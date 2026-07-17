@@ -24,7 +24,12 @@ cargo test
 cargo run --example step_smoke
 cargo run --example inversion_smoke
 cargo run --example forge_64d
+
+# needs Qwen embed server (llama-server --embeddings on :8302)
+cargo run --example qwen_particles
 ```
+
+Embed default: `Qwen3-Embedding-8B-Q8_0.gguf` → 4096-d → bin-average project to **64-d** unit vectors → physics step.
 
 ## Layout
 

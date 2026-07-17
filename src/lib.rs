@@ -4,6 +4,8 @@
 //! model of "grammar." Ported and simplified from the curated SplatRag physics_lang
 //! rebuild materials.
 
+pub mod embed;
+
 use nalgebra::DVector;
 
 /// Tunable integration / force scales (subset of historical PhysicsLangKnobs).
