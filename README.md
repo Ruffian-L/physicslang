@@ -11,6 +11,15 @@ Syntax and coherence are treated as **emergent from forces** (charge, springs, v
 
 **Ontological inversion** is first-class: negative steering along a concept axis maps a state toward its **structured antipode** (Householder reflection), not to zero. See `antipode` / `invert_toward_antipode` / `StepContext::inversion_axis`.
 
+### Human language vs latent language
+
+| Mode | Particles are | Charge / POS | Example |
+|------|----------------|--------------|---------|
+| Human-facing | Word/phrase embeds | Optional role bias | `qwen_particles`, `qwen_ab_charge` |
+| **Latent language** | Points in **64D forge** (hidden/latent states) | **Off** — geometry + springs + goal + scar + inversion | `latent_lang` |
+
+Same engine. Latent mode is PhysicsLang where the “utterance” is a trajectory in latent space, not an English sentence.
+
 ## Status
 
 Day-1+ scaffold. Compiles. Unit tests + smoke examples.  
@@ -27,6 +36,8 @@ cargo run --example forge_64d
 
 # needs Qwen embed server (llama-server --embeddings on :8302)
 cargo run --example qwen_particles
+cargo run --example qwen_ab_charge
+cargo run --example latent_lang
 ```
 
 Embed default: `Qwen3-Embedding-8B-Q8_0.gguf` → 4096-d → bin-average project to **64-d** unit vectors → physics step.
