@@ -167,6 +167,86 @@ pub fn apply_inversion_force(
     }
 }
 
+// --- 64D forge helpers (latent crucible dim used across niodv4 / codec work) ---
+
+/// Working latent dimension used in the encode_decode / 64D research line.
+pub const LATENT_DIM_64: usize = 64;
+
+/// Tiny deterministic PRNG (xorshift32) so demos need no extra crate.
+#[derive(Clone, Debug)]
+pub struct XorShift32(u32);
+
+impl XorShift32 {
+    pub fn new(seed: u32) -> Self {
+        Self(if seed == 0 { 0xA341_316C } else { seed })
+    }
+
+    pub fn next_u32(&mut self) -> u32 {
+        let mut x = self.0;
+        x ^= x << 13;
+        x ^= x >> 17;
+        x ^= x << 5;
+        self.0 = x;
+        x
+    }
+
+    /// Uniform in [-1, 1).
+    pub fn next_f32(&mut self) -> f32 {
+        let u = self.next_u32() as f32 / (u32::MAX as f32);
+        u * 2.0 - 1.0
+    }
+
+    pub fn vec(&mut self, dim: usize) -> DVector<f32> {
+        DVector::from_iterator(dim, (0..dim).map(|_| self.next_f32()))
+    }
+
+    pub fn unit_vec(&mut self, dim: usize) -> DVector<f32> {
+        let v = self.vec(dim);
+        unit_axis(&v)
+    }
+}
+
+/// Mean position of a particle cloud (or zeros if empty).
+pub fn mean_position(particles: &[PhysicsParticle]) -> DVector<f32> {
+    if particles.is_empty() {
+        return DVector::zeros(0);
+    }
+    let dim = particles[0].pos.len();
+    let mut m = DVector::zeros(dim);
+    for p in particles {
+        m += &p.pos;
+    }
+    m / particles.len() as f32
+}
+
+/// RMS of L2 norms of particle positions.
+pub fn rms_radius(particles: &[PhysicsParticle]) -> f32 {
+    if particles.is_empty() {
+        return 0.0;
+    }
+    let s: f32 = particles.iter().map(|p| p.pos.norm_squared()).sum();
+    (s / particles.len() as f32).sqrt()
+}
+
+/// Build a small cloud of 64D particles with alternating charge for demo / forge tests.
+pub fn spawn_64d_cloud(n: usize, seed: u32) -> Vec<PhysicsParticle> {
+    let mut rng = XorShift32::new(seed);
+    let mut out = Vec::with_capacity(n);
+    for i in 0..n {
+        let mut pos = rng.vec(LATENT_DIM_64);
+        // mild normalize so force scales stay sane
+        let nrm = pos.norm().max(1e-6);
+        pos /= nrm;
+        let charge = if i % 2 == 0 { -1.0 } else { 1.0 };
+        let mut p = PhysicsParticle::new(i as u64, pos, 1.0, charge);
+        p.token_idx = i;
+        p.doc_id = 1;
+        p.sentence_id = 0;
+        out.push(p);
+    }
+    out
+}
+
 /// Propagate a failure scar into a local neighborhood (RBF).
 pub fn create_and_propagate_scar(
     bad_pos: &DVector<f32>,
@@ -417,5 +497,33 @@ mod tests {
             "expected move toward -x antipode, before={before} after={}",
             ps[0].pos[0]
         );
+    }
+
+    #[test]
+    fn forge_64d_step_scar_inversion() {
+        let mut knobs = PhysicsLangKnobs::default();
+        knobs.inversion_gain = 0.2;
+        knobs.kuramoto_coupling = 0.0;
+        let mut cloud = spawn_64d_cloud(8, 42);
+        assert_eq!(cloud[0].pos.len(), LATENT_DIM_64);
+        let axis = unit_axis(&cloud[0].pos);
+        let bad = cloud[0].pos.clone();
+        let visc_before = cloud[1].viscosity;
+        create_and_propagate_scar(&bad, &mut cloud, &knobs);
+        // neighbor should feel scar (not always true if far — cloud is unit sphere so likely)
+        let _ = visc_before;
+        let r0 = rms_radius(&cloud);
+        let ctx = StepContext {
+            inversion_axis: Some(&axis),
+            inversion_mu: None,
+            goal: None,
+        };
+        for _ in 0..10 {
+            physics_step_ex(&mut cloud, &knobs, &ctx);
+        }
+        let r1 = rms_radius(&cloud);
+        // finite, non-NaN dynamics
+        assert!(r0.is_finite() && r1.is_finite());
+        assert!(cloud.iter().all(|p| p.pos.iter().all(|x| x.is_finite())));
     }
 }

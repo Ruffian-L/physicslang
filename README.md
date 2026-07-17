@@ -23,14 +23,16 @@ cd physicslang
 cargo test
 cargo run --example step_smoke
 cargo run --example inversion_smoke
+cargo run --example forge_64d
 ```
 
 ## Layout
 
 ```text
-src/lib.rs                 # particles, forces, scars, inversion
+src/lib.rs                 # particles, forces, scars, inversion, 64D helpers
 examples/step_smoke.rs
 examples/inversion_smoke.rs
+examples/forge_64d.rs      # 64D cloud + scar + inversion (latent crucible)
 docs/                      # northstar + porting notes
 docs/SOURCES.md
 ```
