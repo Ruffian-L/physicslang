@@ -1,0 +1,59 @@
+# Expanded PhysicsConfig / Knobs for PhysicsLang Rebuild
+# Merge these into src/config.rs HyperParameters + PhysicsKnobs + new PhysicsLangKnobs
+# and splat_config.toml [physics_lang] or [generative.physics]
+
+[physics]
+# Core integration
+dt = 0.016
+viscosity_scale = 0.35
+force_cap = 7.5
+goal_strength = 5.5          # black-hole pull for query/goal
+
+# Splat / scar (SplatRAG memory physics)
+splat_sigma = 35.0
+splat_alpha = 2.0
+min_splat_dist = 100.0
+splat_delta_threshold = 12.0
+splat_lambda_default = 0.02
+pain_decay_factor = 0.7
+dream_correction_threshold = 6.0
+
+# Gradient / manifold
+gradient_topk = 2048
+steer_hidden = true
+manifold_pullback = 0.15
+bundle_min_dist = 0.05
+
+# --- Gravitation Grammar specific (syntactic forces) ---
+syntactic_charge_noun = -1.0
+syntactic_charge_verb = +1.0
+syntactic_charge_adj = +0.5
+syntactic_charge_boost = 1.0   # multiplier for charge forces
+charge_gated_hopfield = true
+
+# Springs / bonds (sequence grammar)
+spring_k_token = 0.52          # adjacent tokens
+spring_k_sentence = 0.052      # within sentence
+spring_k_dep = 1.85            # dependency tree (high = rigid)
+spring_k_coref = 12.8          # coreference tethers (almost unbreakable)
+spring_rest_adj = 1.0
+spring_rest_dep = 3.0
+
+# Kuramoto / oscillatory (temporal binding grammar)
+kuramoto_coupling = 0.8
+kuramoto_beta_min = 8.0
+kuramoto_beta_max = 15.0
+ou_theta = 2.0                 # damping (higher = snaps to reality)
+ou_sigma = 0.05                # noise (tiny for tight clusters)
+ou_temperature = 0.001
+
+# Negative mass / scars / anti-gravity
+neg_mass_stopword = -2.1
+neg_mass_rare_boost = 4.5
+repulsion_mult = 1.0
+spike_repulsion = 10.0         # for [SPIKE] tag or loop break
+
+# Other historical
+g_gravity = 0.042
+k_e_coulomb = 0.8
+hamming_modulation = 0.67

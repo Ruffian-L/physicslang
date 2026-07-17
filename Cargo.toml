@@ -1,0 +1,13 @@
+[package]
+name = "physicslang"
+version = "0.1.0"
+edition = "2021"
+description = "PhysicsLang day-1 scaffold: tokens as particles; grammar as force laws"
+license = "MIT OR Apache-2.0"
+authors = ["Jason Van Pham"]
+readme = "README.md"
+
+[dependencies]
+nalgebra = "0.33"
+
+[dev-dependencies]
