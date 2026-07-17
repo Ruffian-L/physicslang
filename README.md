@@ -9,10 +9,12 @@ AI research team (build history): Shep, Echo, Lumina · tooling: Grok, Gemini, C
 
 Syntax and coherence are treated as **emergent from forces** (charge, springs, viscosity, scars) on token-particles in embedding / latent space — not as prompt rules alone.
 
+**Ontological inversion** is first-class: negative steering along a concept axis maps a state toward its **structured antipode** (Householder reflection), not to zero. See `antipode` / `invert_toward_antipode` / `StepContext::inversion_axis`.
+
 ## Status
 
-Clean rebuild scaffold. Compiles. Smoke test for a single `physics_step`.  
-Historical code and notes live under `docs/` and the paths listed in `docs/SOURCES.md`.
+Day-1+ scaffold. Compiles. Unit tests + smoke examples.  
+Historical notes under `docs/` and `docs/SOURCES.md`.
 
 ## Build
 
@@ -20,14 +22,17 @@ Historical code and notes live under `docs/` and the paths listed in `docs/SOURC
 cd physicslang
 cargo test
 cargo run --example step_smoke
+cargo run --example inversion_smoke
 ```
 
 ## Layout
 
 ```text
-src/lib.rs          # particle, knobs, physics_step, scar helper
-docs/               # northstar + porting notes from curated rebuild
-docs/SOURCES.md     # where the older dumps live on disk
+src/lib.rs                 # particles, forces, scars, inversion
+examples/step_smoke.rs
+examples/inversion_smoke.rs
+docs/                      # northstar + porting notes
+docs/SOURCES.md
 ```
 
 ## Not in this crate (yet)
